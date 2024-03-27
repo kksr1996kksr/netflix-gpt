@@ -2,7 +2,11 @@ import React, { useRef, useState } from "react";
 import Header from "./Header";
 import poster from "../resources/netflixposter.jpg";
 import { checkValidData } from "../utils/validate";
-
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
 const Login = () => {
   const [isSignIn, setSignIn] = useState(true);
   const [errorMessage, setErrorMessage] = useState();
@@ -17,6 +21,50 @@ const Login = () => {
     // Validate the form data on this button click
     const msg = checkValidData(email.current.value, password.current.value);
     setErrorMessage(msg);
+    if (msg) return;
+
+    if (isSignIn) {
+      // Sign in logic
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(
+            "error code: " + errorCode + ", error message: " + errorMessage
+          );
+        });
+    } else {
+      // sign up logic
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          console.log(user);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(
+            "error code : " + errorCode + ", error message: " + errorMessage
+          );
+          // ..
+        });
+    }
   };
 
   return (
@@ -36,20 +84,20 @@ const Login = () => {
           type="email"
           placeholder="Email Address"
           ref={email}
-          className="py-3 px-4 m-2 my-6 block w-full bg-gray-800 bg-transparent bg-opacity-80 rounded-md text-white"
+          className="py-3 px-4 m-2 my-6 block w-full bg-gray-800 bg-transparent bg-opacity-80 rounded-md text-white border-gray-300 border-[1px]"
         />
         {!isSignIn && (
           <input
             type="text"
             placeholder="Enter Name"
-            className="py-3 px-4 m-2 my-6 block w-full bg-gray-800 bg-transparent bg-opacity-80 rounded-md text-white"
+            className="py-3 px-4 m-2 my-6 block w-full bg-gray-800 bg-transparent bg-opacity-80 rounded-md text-white border-gray-300 border-[1px]"
           />
         )}
         <input
           type="password"
           placeholder="Enter Password"
           ref={password}
-          className="py-3 px-4 m-2 block w-full bg-gray-800 bg-transparent bg-opacity-80 rounded-md text-white"
+          className="py-3 px-4 m-2 block w-full bg-gray-800 bg-transparent bg-opacity-80 rounded-md text-white border-gray-300 border-[1px]"
         />
         <p className="text-red-600 xl mx-4 mt-4">{errorMessage}</p>
         <button
