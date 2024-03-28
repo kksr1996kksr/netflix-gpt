@@ -1,7 +1,12 @@
 import React from "react";
+import Header from "./Header";
 
 const Browse = () => {
-  return <div>Browse</div>;
+  return (
+    <div className="absolute bg-black w-full h-full">
+      <Header></Header>
+    </div>
+  );
 };
 
 export default Browse;

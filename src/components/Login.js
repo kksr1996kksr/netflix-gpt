@@ -5,13 +5,17 @@ import { checkValidData } from "../utils/validate";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [isSignIn, setSignIn] = useState(true);
   const [errorMessage, setErrorMessage] = useState();
   const email = useRef(null);
+  const name = useRef(null);
   const password = useRef(null);
+  const navigate = useNavigate();
 
   const toggleSignInForm = () => {
     setSignIn(!isSignIn);
@@ -33,7 +37,7 @@ const Login = () => {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          console.log(user);
+          navigate("/browse");
           // ...
         })
         .catch((error) => {
@@ -53,7 +57,20 @@ const Login = () => {
         .then((userCredential) => {
           // Signed up
           const user = userCredential.user;
-          console.log(user);
+          updateProfile(user, {
+            displayName: name.current.value,
+          })
+            .then(() => {
+              navigate("/browse");
+            })
+            .catch((error) => {
+              setErrorMessage(
+                "error code : " +
+                  error.code +
+                  ", error message: " +
+                  error.message
+              );
+            });
           // ...
         })
         .catch((error) => {
@@ -89,6 +106,7 @@ const Login = () => {
         {!isSignIn && (
           <input
             type="text"
+            ref={name}
             placeholder="Enter Name"
             className="py-3 px-4 m-2 my-6 block w-full bg-gray-800 bg-transparent bg-opacity-80 rounded-md text-white border-gray-300 border-[1px]"
           />
